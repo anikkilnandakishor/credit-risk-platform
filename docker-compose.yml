@@ -1,0 +1,62 @@
+# Credit Risk Platform — Streamlit UI + FastAPI backend
+# Usage: docker compose up --build
+#   Dashboard: http://localhost:8501
+#   API docs:  http://localhost:8000/docs
+
+name: credit-risk-platform
+
+x-app-common: &app-common
+  build:
+    context: .
+    dockerfile: Dockerfile
+  env_file:
+    - path: .env
+      required: false
+  environment:
+    PYTHONPATH: /app
+    DATABASE_URL: sqlite:///./data/credit_risk.db
+    MODEL_PATH: models/model.pkl
+  volumes:
+    - ./data:/app/data
+    - ./models:/app/models
+  restart: unless-stopped
+  networks:
+    - credit-risk-net
+
+services:
+  streamlit:
+    <<: *app-common
+    container_name: credit-risk-streamlit
+    command: ["streamlit"]
+    ports:
+      - "${STREAMLIT_PORT:-8501}:8501"
+    environment:
+      PYTHONPATH: /app
+      STREAMLIT_PORT: "8501"
+      API_PORT: "8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8501/_stcore/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+
+  api:
+    <<: *app-common
+    container_name: credit-risk-api
+    command: ["api"]
+    ports:
+      - "${API_PORT:-8000}:8000"
+    environment:
+      PYTHONPATH: /app
+      API_PORT: "8000"
+    healthcheck:
+      test: ["CMD", "curl", "-fsS", "http://127.0.0.1:8000/docs"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 45s
+
+networks:
+  credit-risk-net:
+    driver: bridge

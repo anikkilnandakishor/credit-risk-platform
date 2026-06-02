@@ -1,0 +1,37 @@
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Secrets and local config
+.env
+.env.*
+
+# Large / generated artifacts (mount at runtime)
+data/*.csv
+data/*.parquet
+data/*.db
+models/*.pkl
+models/*.joblib
+
+# Dev & IDE
+.git/
+.gitignore
+.idea/
+.vscode/
+*.swp
+notebooks/
+documents/
+logs/
+*.log
+
+# Python cache
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+*.egg-info/
+
+# OS
+.DS_Store
+Thumbs.db
